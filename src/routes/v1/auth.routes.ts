@@ -13,6 +13,172 @@ const router = Router();
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: a3f8c2d1-4b5e-4f6a-8c9d-1e2f3a4b5c6d
+ *         name:
+ *           type: string
+ *           example: Alice Johnson
+ *         email:
+ *           type: string
+ *           example: alice@example.com
+ *         username:
+ *           type: string
+ *           example: alicej
+ *         phone:
+ *           type: string
+ *           example: +1-555-0101
+ *         role:
+ *           type: string
+ *           enum: [HOST, GUEST, ADMIN]
+ *           example: HOST
+ *         avatar:
+ *           type: string
+ *           nullable: true
+ *           example: https://res.cloudinary.com/example/image.jpg
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           example: 2026-01-01T00:00:00.000Z
+ *     AuthResponse:
+ *       type: object
+ *       properties:
+ *         token:
+ *           type: string
+ *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *         user:
+ *           $ref: '#/components/schemas/User'
+ *     RegisterInput:
+ *       type: object
+ *       required:
+ *         - name
+ *         - email
+ *         - username
+ *         - phone
+ *         - password
+ *       properties:
+ *         name:
+ *           type: string
+ *           example: Alice Johnson
+ *         email:
+ *           type: string
+ *           example: alice@example.com
+ *         username:
+ *           type: string
+ *           example: alicej
+ *         phone:
+ *           type: string
+ *           example: +1-555-0101
+ *         password:
+ *           type: string
+ *           example: password123
+ *         role:
+ *           type: string
+ *           enum: [HOST, GUEST]
+ *           example: HOST
+ *     LoginInput:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           example: alice@example.com
+ *         password:
+ *           type: string
+ *           example: password123
+ *     ErrorResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: Resource not found
+ *     CreateReviewInput:
+ *       type: object
+ *       required:
+ *         - rating
+ *         - comment
+ *       properties:
+ *         rating:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 5
+ *           example: 4
+ *         comment:
+ *           type: string
+ *           example: Great place to stay!
+ *     Review:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: a3f8c2d1-4b5e-4f6a-8c9d-1e2f3a4b5c6d
+ *         rating:
+ *           type: integer
+ *           example: 4
+ *         comment:
+ *           type: string
+ *           example: Great place to stay!
+ *         userId:
+ *           type: string
+ *         listingId:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *     Booking:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: a3f8c2d1-4b5e-4f6a-8c9d-1e2f3a4b5c6d
+ *         checkIn:
+ *           type: string
+ *           format: date-time
+ *         checkOut:
+ *           type: string
+ *           format: date-time
+ *         totalPrice:
+ *           type: number
+ *           example: 480
+ *         status:
+ *           type: string
+ *           enum: [PENDING, CONFIRMED, CANCELLED]
+ *         guestId:
+ *           type: string
+ *         listingId:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *     CreateBookingInput:
+ *       type: object
+ *       required:
+ *         - listingId
+ *         - checkIn
+ *         - checkOut
+ *       properties:
+ *         listingId:
+ *           type: string
+ *           example: a3f8c2d1-4b5e-4f6a-8c9d-1e2f3a4b5c6d
+ *         checkIn:
+ *           type: string
+ *           format: date-time
+ *           example: 2026-08-01T00:00:00.000Z
+ *         checkOut:
+ *           type: string
+ *           format: date-time
+ *           example: 2026-08-05T00:00:00.000Z
+ */
+
+/**
+ * @swagger
  * /auth/register:
  *   post:
  *     summary: Register a new user
@@ -143,6 +309,7 @@ router.post("/change-password", authenticate, changePassword);
  *   post:
  *     summary: Request a password reset email
  *     tags: [Auth]
+ *     description: Always returns the same response whether the email exists or not
  *     requestBody:
  *       required: true
  *       content:
