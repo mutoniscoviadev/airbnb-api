@@ -2,6 +2,8 @@ import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { Express } from "express";
 
+const API_URL = process.env["API_URL"] || "http://localhost:3000";
+
 const options: swaggerJsdoc.Options = {
   definition: {
     openapi: "3.0.0",
@@ -12,7 +14,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: `${process.env["API_URL"] || "http://localhost:3000"}/api/v1`,
+        url: `${API_URL}/api/v1`,
         description: "API Server",
       },
     ],
@@ -30,9 +32,9 @@ const options: swaggerJsdoc.Options = {
   apis: ["./src/routes/v1/*.ts"],
 };
 
-const swaggerSpec = swaggerJsdoc(options);
-
 export const setupSwagger = (app: Express): void => {
+  const swaggerSpec = swaggerJsdoc(options);
+
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
   app.get("/api-docs.json", (req, res) => {
