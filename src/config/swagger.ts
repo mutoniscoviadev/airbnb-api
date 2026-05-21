@@ -8,12 +8,12 @@ const options: swaggerJsdoc.Options = {
     info: {
       title: "Airbnb API",
       version: "1.0.0",
-      description: "A full-featured REST API that mimics Airbnb",
+      description: "A full-featured REST API that mimics Airbnb — users can register, list properties, make bookings, upload photos, and more. Built with Node.js, Express, TypeScript, and PostgreSQL.",
     },
     servers: [
       {
-        url: "http://localhost:3000/api/v1",
-        description: "Development server",
+        url: process.env["API_URL"] || "http://localhost:3000",
+        description: "API Server",
       },
     ],
     components: {
@@ -22,6 +22,7 @@ const options: swaggerJsdoc.Options = {
           type: "http",
           scheme: "bearer",
           bearerFormat: "JWT",
+          description: "Enter your JWT token",
         },
       },
     },
