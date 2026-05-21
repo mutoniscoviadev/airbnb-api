@@ -1,4 +1,5 @@
 import "dotenv/config";
+import cors from "cors";
 import express, { Request, Response, NextFunction } from "express";
 import compression from "compression";
 import morgan from "morgan";
@@ -12,6 +13,9 @@ import { deprecateV1 } from "./middlewares/deprecation.middleware";
 
 const app = express();
 const PORT = Number(process.env["PORT"]) || 3000;
+
+// CORS — must be first
+app.use(cors());
 
 app.use(compression());
 
