@@ -14,8 +14,13 @@ import { deprecateV1 } from "./middlewares/deprecation.middleware";
 const app = express();
 const PORT = Number(process.env["PORT"]) || 3000;
 
-// CORS — must be first
-app.use(cors());
+// CORS — allow all origins including Swagger UI
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+  credentials: false,
+}));
 
 app.use(compression());
 
