@@ -14,13 +14,19 @@ import { deprecateV1 } from "./middlewares/deprecation.middleware";
 const app = express();
 const PORT = Number(process.env["PORT"]) || 3000;
 
-// CORS — allow all origins including Swagger UI
-app.use(cors({
-  origin: "*",
+const corsOptions: cors.CorsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://airbnb-frontend-cyan.vercel.app",
+  ],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-  credentials: false,
-}));
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(compression());
 
@@ -35,7 +41,6 @@ app.use(express.json());
 app.use(generalLimiter);
 app.post("*", strictLimiter);
 
-// Health check — MUST be before setupSwagger and all other routes
 app.get("/health", (req: Request, res: Response) => {
   res.json({
     status: "ok",
@@ -44,10 +49,8 @@ app.get("/health", (req: Request, res: Response) => {
   });
 });
 
-// Swagger comes AFTER health
 setupSwagger(app);
 
-// Debug logger — remove after testing
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`>>> ${req.method} ${req.url}`);
   next();
@@ -56,12 +59,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use("/api/v1", deprecateV1, v1Router);
 app.use("/", uploadRouter);
 
-// 404 handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-// Global error handler — must be last
 app.use(errorHandler);
 
 const main = async () => {

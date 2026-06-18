@@ -41,10 +41,37 @@ export const getAllBookings = async (req: AuthRequest, res: Response, next: Next
   }
 };
 
+// GET /bookings/my - Get current guest's own bookings
+export const getMyBookings = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const guestId = req.userId!;
+
+    const bookings = await prisma.booking.findMany({
+      where: { guestId },
+      include: {
+        listing: {
+          select: {
+            id: true,
+            title: true,
+            location: true,
+            type: true,
+            pricePerNight: true,
+            host: { select: { name: true, avatar: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.status(200).json(bookings);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // GET /bookings/:id - Get a single booking
 export const getBookingById = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    // ✅ No parseInt — id is now a string UUID
     const id = req.params.id;
 
     const booking = await prisma.booking.findUnique({
@@ -87,7 +114,6 @@ export const createBooking = async (req: AuthRequest, res: Response, next: NextF
       return;
     }
 
-    // ✅ guestId is now a string UUID from token
     const guestId = req.userId!;
 
     const listing = await prisma.listing.findFirst({
@@ -101,7 +127,6 @@ export const createBooking = async (req: AuthRequest, res: Response, next: NextF
     const checkInDate = new Date(result.data.checkIn);
     const checkOutDate = new Date(result.data.checkOut);
 
-    // Check for booking conflicts
     const conflict = await prisma.booking.findFirst({
       where: {
         listingId: result.data.listingId,
@@ -164,7 +189,6 @@ export const createBooking = async (req: AuthRequest, res: Response, next: NextF
 // PATCH /bookings/:id/status - Update booking status
 export const updateBookingStatus = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    // ✅ No parseInt
     const id = req.params.id;
     const { status } = req.body;
 
@@ -194,7 +218,6 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response, next:
 // DELETE /bookings/:id - Cancel a booking
 export const deleteBooking = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    // ✅ No parseInt
     const id = req.params.id;
 
     const booking = await prisma.booking.findFirst({
